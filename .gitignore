@@ -1,0 +1,7 @@
+__MACOSX/
+__pycache__/
+*.pyc
+venv/
+.env
+dump.rdb
+.DS_Store
