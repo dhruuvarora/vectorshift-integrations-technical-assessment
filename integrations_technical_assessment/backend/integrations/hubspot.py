@@ -1,17 +1,19 @@
-from http.client import HTTPException
 import json
 import secrets
 import base64
-from integrations_technical_assessment.backend.integrations.airtable import CLIENT_SECRET
-from integrations_technical_assessment.backend.integrations.integration_item import IntegrationItem
-from redis_client import add_key_value_redis, get_value_redis, delete_key_redis
 import requests
-from fastapi import Request
+import httpx
+
+from fastapi import Request, HTTPException
 from fastapi.responses import HTMLResponse
+
+from integrations.integration_item import IntegrationItem
+from redis_client import add_key_value_redis, get_value_redis, delete_key_redis
 
 CLIENT_ID = "YOUR_HUBSPOT_CLIENT_ID"
 REDIRECT_URI = "http://localhost:8000/integrations/hubspot/oauth2callback"
 SCOPE = "crm.objects.contacts.read"
+CLIENT_SECRET = "YOUR_HUBSPOT_CLIENT_SECRET"
 
 async def authorize_hubspot(user_id, org_id):
     state_data = {
@@ -69,7 +71,7 @@ async def oauth2callback_hubspot(request: Request):
     if not saved_state or original_state != json.loads(saved_state).get("state"):
         raise HTTPException(status_code=400, detail="State does not match")
 
-    async with HTTPException.AsyncClient() as client:
+    async with httpx.AsyncClient() as client:
         response = await client.post(
             "https://api.hubapi.com/oauth/v1/token",
             data={
